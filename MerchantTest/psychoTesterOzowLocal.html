@@ -1,0 +1,94 @@
+<HTML>
+	<HEAD>
+		<TITLE>iPay Tester</TITLE>
+		<script src="https://code.jquery.com/jquery-latest.min.js" type="text/javascript"></script>
+		<script src="js/sha512.js" type="text/javascript"></script>
+	</HEAD>
+	<BODY>
+		<FORM action="https://localhost:44391/" method="post"  accept-charset="utf-8">
+		<table>
+			<tr>
+				<td valign="top">
+					<p>SiteCode:<INPUT type="text" name="SiteCode" value="TSTSTE0001"/></p>
+					<p>CountryCode:<INPUT type="text" name="CountryCode" value="ZA"/></p>
+					<p>CurrencyCode:<INPUT type="text" name="CurrencyCode" value="ZAR"/></p>
+					<p>Amount:<INPUT type="text" name="Amount" value="0.01"/></p>
+					<p>TransactionReference:<INPUT type="text" name="TransactionReference" value="Test1"/></p>
+					<p>BankReference:<INPUT type="text" name="BankReference" value="Test1"/></p>
+					<p>Optional1:<INPUT type="text" name="Optional1" value="1"/></p>
+					<p>Optional2:<INPUT type="text" name="Optional2" value="2"/></p>
+					<p>Optional3:<INPUT type="text" name="Optional3" value="3"/></p>
+					<p>Optional4:<INPUT type="text" name="Optional4" value="4"/></p>
+					<p>Optional5:<INPUT type="text" name="Optional5" value="5"/></p>
+					
+					<p>Customer:<INPUT type="text" name="Customer" value="Test Customer"/></p>
+					
+					<p>CancelUrl:<INPUT type="text" name="CancelUrl" value="http://test.i-pay.co.za/responsetest.php"/></p>					
+					<p>ErrorUrl:<INPUT type="text" name="ErrorUrl" value="http://test.i-pay.co.za/responsetest.php"/></p>
+					<p>SuccessUrl:<INPUT type="text" name="SuccessUrl" value="http://test.i-pay.co.za/responsetest.php"/></p>
+					<p>NotifyUrl:<INPUT type="text" name="NotifyUrl" value="http://test.i-pay.co.za/responsetest.php"/></p>
+					<p>IsTest:<input type='checkbox' name='isTest' value='true' /></p>
+					<p>BankId:<INPUT type="text" name="BankId"/></p>
+					<p>BankAccountNumber:<INPUT type="text" name="BankAccountNumber" /></p>
+					<p>BranchCode:<INPUT type="text" name="BranchCode" /></p>
+					<p>BankAccountName:<INPUT type="text" name="BankAccountName" /></p>
+					<p>PayeeDisplayName:<INPUT type="text" name="PayeeDisplayName" /></p>
+					<p>IsPublicRecipient:<INPUT type="checkbox" name="IsPublicRecipient" /></p>
+					<p>ExpiryDateUtc:<INPUT type="text" name="ExpiryDateUtc" /></p>
+					<p>AllowVariableAmount:<input type='checkbox' name='AllowVariableAmount' value='true' /></p>
+					<p>VariableAmountMin:<INPUT type="text" name="VariableAmountMin" /></p>
+					<p>VariableAmountMax:<INPUT type="text" name="VariableAmountMax" /></p>
+					<p>RegisterTokenProfile:<input type='checkbox' name='RegisterTokenProfile' value='true' /></p>
+					<p>TokenNotificationUrl:<INPUT type="text" name="TokenNotificationUrl" value=""/></p>
+					<p>TokenDeletedNotificationUrl:<INPUT type="text" name="TokenDeletedNotificationUrl" value=""/></p>
+					<p>TokenProfileId:<INPUT type="text" name="TokenProfileId" value=""/></p>
+					<p>Token:<INPUT type="text" name="Token" value=""/></p>
+					
+				</td>
+				<td valign="top">
+					<p>Enter private key and click "Generate Hash" to create hashcheck value</p>
+					<p>Private Key:<INPUT type="text" id="PvtKey" value="215114531AFF7134A94C88CEEA48E"/></p>
+					<p><INPUT type="button" id="genHash" onclick="doHash();" value="Generate Hash"/></p>
+					<p>HashCheck:<INPUT type="text" name="HashCheck" value=""/></p>
+					<p><INPUT type="submit" name="sendReq" value="Post"/></p>
+				</td>
+			</tr>
+		</table>
+		</FORM>
+		<script>
+			function doHash()
+			{
+				var stringToHash = '';
+				var formElements = $('form').serializeArray();
+				for(var x = 0; x < formElements.length; x++)
+				{
+					var formElement = formElements[x];	
+					if(formElement.name != 'HashCheck' && formElement.name != 'Token')
+					{
+						var $elem = $("input[name='" + formElement.name + "']");
+						if ($elem.is(":checkbox") && $elem.attr("name") == "IsTest") {
+							stringToHash += $elem.is(":checked") ? "true" : "false";
+						} else if ($elem.is(":checkbox") && $elem.is(":checked")) {
+							stringToHash += "true";
+						} else if ($elem.is(":input") && $elem.prop("type") == "text") {
+							stringToHash += $elem.val();
+						}
+						
+						if (formElement.name == 'NotifyUrl') {
+							if (!$("input[name='isTest']").is(":checked")) {
+								stringToHash += "false";
+							}
+						}
+						
+						console.log($elem.val());
+					}
+				}
+				
+				stringToHash += $('#PvtKey').val();
+				console.log(stringToHash.toLowerCase());
+				var hash = sha512(stringToHash.toLowerCase());
+				$('input[name=HashCheck]').val(hash);
+			}
+		</script>
+	</BODY>
+</HTML>
